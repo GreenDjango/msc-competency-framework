@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  node-version: 16.x
+  node-version: 16
 
 jobs:
 
@@ -21,9 +21,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Setup Node.js version ${{ env.node-version }}
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ env.node-version }}
+          cache: 'yarn'
 
       - run: yarn install --frozen-lockfile --non-interactive
       - run: yarn run check
@@ -42,12 +44,14 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Setup Node.js version ${{ env.node-version }}
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ env.node-version }}
+          cache: 'yarn'
 
       - run: yarn install --frozen-lockfile --non-interactive
-      - run: yarn run build
+      - run: yarn run build --base=/${{ github.event.repository.name }}/
 
       - name: Setup Pages
         uses: actions/configure-pages@v1
