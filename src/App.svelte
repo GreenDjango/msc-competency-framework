@@ -23,7 +23,7 @@
   let domainGroup: { [domain: string]: { [skill: string]: string[] } } = {}
 
   onMount(async () => {
-    competencyFrameworkData = (await import('./data/competency-framework.json')).data
+    competencyFrameworkData = (await import('./data/competency-framework.json')).default.data
   })
 
   $: competenceBySpe = competencyFrameworkData.filter((val) => val.filter === speFilter)
