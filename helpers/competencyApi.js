@@ -5,8 +5,8 @@ import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import axios from 'axios'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 async function main() {
   const res = await axios.get('https://flo.uri.sh/visualisation/8474060/embed')
@@ -20,7 +20,10 @@ async function main() {
    * projects: {[key:string]: {id: string, label: string}},
    * domains: {[key:string]: {id: string, label: string, children: Set<string>}},
    * skills: {[key:string]: {id: string, label: string, domainId: string, children: Set<string>}},
-   * behaviors: {[key:string]: {id: string, label: string, skillId: string, trainingPathId: string, projects: Set<string>}},
+   * behaviors: {[key:string]: {
+   *  id: string, label: string, domainId: string, skillId: string, trainingPathId: string,
+   *  projects: {[key:string]: {projectId: string, weight: number}}
+   * }},
    * }}
    */
   const parse = {
@@ -37,6 +40,7 @@ async function main() {
     const skillKey = rawBehavior.nest_columns[1]
     const behaviorKey = rawBehavior.nest_columns[2]
     const projectKey = rawBehavior.nest_columns[3]
+    const projectWeight = parseInt(rawBehavior.size_columns[0])
 
     if (!parse.trainingPath[speKey]) {
       parse.trainingPath[speKey] = { id: speKey, label: speKey }
@@ -63,16 +67,17 @@ async function main() {
       parse.behaviors[behaviorKey + speKey] = {
         id: `${id}.${speKey}`,
         label,
+        domainId: domain.id,
         skillId: skill.id,
         trainingPathId: speKey,
-        projects: new Set(),
+        projects: {},
       }
     }
     const behavior = parse.behaviors[behaviorKey + speKey]
 
     domain.children.add(skill.id)
     skill.children.add(behavior.id)
-    behavior.projects.add(projectKey)
+    behavior.projects[projectKey] = { projectId: projectKey, weight: projectWeight }
   }
 
   const output = {
@@ -84,7 +89,7 @@ async function main() {
   }
   output.domains.forEach((val) => (val.children = [...val.children].sort()))
   output.skills.forEach((val) => (val.children = [...val.children].sort()))
-  output.behaviors.forEach((val) => (val.projects = [...val.projects].sort()))
+  output.behaviors.forEach((val) => (val.projects = Object.values(val.projects)))
 
   writeFile(
     resolve(__dirname, '..', 'src', 'data', 'competency-framework.json'),

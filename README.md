@@ -11,6 +11,7 @@ $ yarn run dev       # start hot reload development sever
 $ yarn run build     # build project for static delivery in ./dist
 $ yarn run preview   # preview static files from ./dist
 $ yarn run check     # check svelte and typescript error
+$ yarn run generate:competencies # refetch competencies data json file
 ```
 
 ## Recommended IDE Setup
