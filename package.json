@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
-  "devDependencies": {
+  "dependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
     "@tsconfig/svelte": "^3.0.0",
     "sass": "^1.54.0",
@@ -19,6 +19,10 @@
     "tslib": "^2.4.0",
     "typescript": "^4.6.4",
     "vite": "^3.0.0"
+  },
+  "devDependencies": {
+    "axios": "^0.27.2",
+    "prettier": "^2.7.1"
   },
   "prettier": {
     "trailingComma": "es5",
