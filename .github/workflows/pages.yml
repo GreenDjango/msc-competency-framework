@@ -52,6 +52,7 @@ jobs:
 
       - run: yarn install --prod --frozen-lockfile --non-interactive
       - run: yarn run build --base=/${{ github.event.repository.name }}/
+      - run: cp ./dist/index.html ./dist/404.html 
 
       - name: Setup Pages
         uses: actions/configure-pages@v1
