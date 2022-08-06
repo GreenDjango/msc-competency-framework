@@ -1,98 +1,25 @@
 <script lang="ts">
   import githubLogo from './assets/github.svg'
   import svelteLogo from './assets/svelte.svg'
-  import { onMount } from 'svelte'
-
-  enum CompCol {
-    'domain' = 0,
-    'skill',
-    'behavior',
-    'project',
-  }
-  type Spe = 'AIA' | 'CLO' | 'DAT' | 'DIT' | 'IOT' | 'SEC' | 'VIR' | 'PGD'
-  const speList = new Set<Spe>(['AIA', 'CLO', 'DAT', 'DIT', 'IOT', 'SEC', 'VIR', 'PGD'])
-
-  let competencyFrameworkData: {
-    filter: string
-    nest_columns: string[]
-    size_columns: string[]
-  }[] = []
-  let speFilter: Spe = 'CLO'
-  let projectFilter: string = 'null'
-  let projectList: string[] = []
-  let domainGroup: { [domain: string]: { [skill: string]: string[] } } = {}
-
-  onMount(async () => {
-    competencyFrameworkData = (await import('./data/competency-framework.json')).default.data
-  })
-
-  $: competenceBySpe = competencyFrameworkData.filter((val) => val.filter === speFilter)
-  $: projectList = [
-    ...new Set(competenceBySpe.map((val) => val.nest_columns[CompCol.project])),
-  ].sort((a, b) => a.localeCompare(b))
-  $: competenceByProject = competenceBySpe.filter(
-    (val) => val.nest_columns[CompCol.project] === projectFilter
-  )
-  $: {
-    const newCompetenceGroup = {}
-    for (const comp of competenceByProject) {
-      const domain = comp.nest_columns[CompCol.domain]
-      const skill = comp.nest_columns[CompCol.skill]
-      const behavior = comp.nest_columns[CompCol.behavior]
-
-      if (!newCompetenceGroup[domain]) newCompetenceGroup[domain] = {}
-      if (!newCompetenceGroup[domain][skill]) newCompetenceGroup[domain][skill] = []
-      newCompetenceGroup[domain][skill].push(behavior)
-    }
-    domainGroup = newCompetenceGroup
-  }
+  import Router, { link } from 'svelte-spa-router'
+  import active from 'svelte-spa-router/active'
+  import routes from './routes'
 </script>
 
 <div class="app">
   <header>
-    <h3>MSC</h3>
-    <h2>Competency Framework</h2>
+    <a href="/" class="title">
+      <h3>MSC</h3>
+      <h2>Competency Framework</h2>
+    </a>
+    <ul class="nav">
+      <li><a href="/" use:link use:active>Home</a></li>
+      <li><a href="/chart" use:link use:active>Chart</a></li>
+    </ul>
   </header>
 
   <main>
-    <div class="filter">
-      <label>
-        <span> Spe: </span>
-        <select name="" id="" bind:value={speFilter}>
-          {#each [...speList] as spe}
-            <option value={spe}>{spe}</option>
-          {/each}
-        </select>
-      </label>
-
-      <label>
-        <span> Project: </span>
-        <select name="" id="" bind:value={projectFilter}>
-          <option value="null">Choose a project</option>
-          {#each projectList as project}
-            <option value={project}>{project.replace('T-', '')}</option>
-          {/each}
-        </select>
-      </label>
-    </div>
-
-    <div class="project-info">
-      {#each Object.entries(domainGroup) as [domain, skillGroup]}
-        <div class="domain-block">
-          <span>{domain}</span>
-          <div>
-            {#each Object.entries(skillGroup) as [skill, behaviorList]}
-              <span>{skill}</span>
-              <ul>
-                {#each behaviorList as behavior}
-                  <li>{behavior}</li>
-                {/each}
-              </ul>
-            {/each}
-          </div>
-        </div>
-      {/each}
-    </div>
+    <Router {routes} />
   </main>
 
   <footer>
@@ -126,13 +53,28 @@
     place-items: baseline;
     gap: 1rem;
 
-    h2 {
-      font-size: 1.5rem;
-      line-height: 1.1;
+    .title {
+      display: flex;
+      gap: 1rem;
+      align-items: baseline;
+
+      h2 {
+        font-size: 1.5rem;
+        line-height: 1.1;
+      }
+
+      h3 {
+        color: #646cff;
+      }
     }
 
-    h3 {
-      color: #646cff;
+    .nav {
+      list-style: none;
+      display: flex;
+      gap: 1rem;
+      flex: 1;
+      justify-content: flex-end;
+      font-size: 1.1rem;
     }
   }
 
@@ -140,40 +82,6 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-
-    .filter {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      width: 100%;
-      padding: 1rem;
-    }
-
-    .project-info {
-      display: flex;
-      place-content: center;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      padding: 0 2rem;
-
-      .domain-block {
-        width: 30rem;
-        border: 1px solid #4e4e4e;
-        border-radius: 0.25rem;
-        padding: 1rem;
-
-        > span {
-          font-weight: bold;
-          font-size: 0.9rem;
-          line-height: 2;
-        }
-
-        ul {
-          margin: 1rem 0;
-          padding-left: 2.5rem;
-        }
-      }
-    }
   }
 
   footer {

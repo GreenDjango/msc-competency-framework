@@ -34,10 +34,10 @@ Next you add this config in `.vscode/settings.json`:
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "[typescriptreact]": {
+  "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "[javascriptreact]": {
+  "[scss]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
