@@ -2,6 +2,8 @@
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
 
+  import { pageTransitionDuration } from '../constants'
+
   enum CompCol {
     'domain' = 0,
     'skill',
@@ -47,7 +49,7 @@
   }
 </script>
 
-<div in:fade={{ duration: 200 }}>
+<div in:fade={{ duration: pageTransitionDuration }}>
   <div class="filter">
     <label>
       <span> Spe: </span>

@@ -63,6 +63,7 @@ a {
 
   &:hover {
     color: #dadada;
+    text-decoration: underline;
   }
   &.active {
     color: #646cff;
@@ -86,6 +87,15 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+input[type='file'] {
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  padding: 0.6em 0.8em;
 }
 
 select {

@@ -1,8 +1,10 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
+
+  import { pageTransitionDuration } from '../constants'
 </script>
 
-<div in:fade={{ duration: 200 }} class="page">
+<div in:fade={{ duration: pageTransitionDuration }} class="page">
   <div class="graph">
     <iframe
       scrolling="no"

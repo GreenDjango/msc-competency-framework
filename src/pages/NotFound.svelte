@@ -1,9 +1,11 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
   import { link } from 'svelte-spa-router'
+
+  import { pageTransitionDuration } from '../constants'
 </script>
 
-<div in:fade={{ duration: 200 }} class="p404">
+<div in:fade={{ duration: pageTransitionDuration }} class="p404">
   <h1>Not Found</h1>
   <p>Oops, this route doesn't exist!</p>
   <a href="/" use:link>Go to home</a>
