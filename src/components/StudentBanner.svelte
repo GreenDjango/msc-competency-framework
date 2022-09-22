@@ -22,7 +22,7 @@
       justify-content: center;
       gap: 1.5rem;
       width: 100%;
-      padding: 1rem;
+      padding: 1rem 1rem 0 1rem;
     }
   }
 </style>
