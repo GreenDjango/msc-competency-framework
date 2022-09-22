@@ -1,4 +1,4 @@
-import { encode, decode } from 'js-base64'
+import { decode, encode } from 'js-base64'
 
 export function cleanDOMString(str: string) {
   return str.replaceAll('\n', '').replaceAll(/\s+/g, ' ').trim()
@@ -11,6 +11,16 @@ export function storeBase64(key: string, value: any) {
 
 export function loadBase64(key: string) {
   const rawValue = globalThis.localStorage.getItem(key)
-  if (!rawValue) return rawValue
-  return JSON.parse(decode(rawValue))
+
+  if (!rawValue) return null
+  try {
+    return JSON.parse(decode(rawValue))
+  } catch (err) {
+    console.error(`loadBase64: value=${rawValue}`, err)
+    return null
+  }
+}
+
+export function removeLocalStorageItem(key: string) {
+  globalThis.localStorage.removeItem(key)
 }

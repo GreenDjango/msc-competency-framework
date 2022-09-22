@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
+    "@trivago/prettier-plugin-sort-imports": "^3.3.0",
     "@tsconfig/svelte": "^3.0.0",
     "js-base64": "^3.7.2",
     "sass": "^1.54.0",
@@ -33,6 +34,11 @@
     "tabWidth": 2,
     "singleQuote": true,
     "semi": false,
-    "printWidth": 100
+    "printWidth": 100,
+    "importOrder": [
+      "^[./]"
+    ],
+    "importOrderSeparation": true,
+    "importOrderSortSpecifiers": true
   }
 }

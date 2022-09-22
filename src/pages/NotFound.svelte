@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition'
   import { link } from 'svelte-spa-router'
+  import { fade } from 'svelte/transition'
 
-  import { pageTransitionDuration } from '../lib/constants'
+  import { pageTransitionDuration } from '../routes'
 </script>
 
 <div in:fade={{ duration: pageTransitionDuration }} class="p404">

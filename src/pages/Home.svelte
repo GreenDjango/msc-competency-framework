@@ -2,7 +2,9 @@
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
 
-  import { pageTransitionDuration } from '../lib/constants'
+  import StudentBanner from '../components/StudentBanner.svelte'
+  import { type TrainingPath, trainingPathList } from '../lib/constants'
+  import { pageTransitionDuration } from '../routes'
 
   enum CompCol {
     'domain' = 0,
@@ -10,15 +12,13 @@
     'behavior',
     'project',
   }
-  type Spe = 'AIA' | 'CLO' | 'DAT' | 'DIT' | 'IOT' | 'SEC' | 'VIR' | 'PGD'
-  const speList = new Set<Spe>(['AIA', 'CLO', 'DAT', 'DIT', 'IOT', 'SEC', 'VIR', 'PGD'])
 
   let competencyFrameworkData: {
     filter: string
     nest_columns: string[]
     size_columns: string[]
   }[] = []
-  let speFilter: Spe = 'CLO'
+  let speFilter: TrainingPath = 'CLO'
   let projectFilter: string = 'null'
   let projectList: string[] = []
   let domainGroup: { [domain: string]: { [skill: string]: string[] } } = {}
@@ -35,7 +35,7 @@
     (val) => val.nest_columns[CompCol.project] === projectFilter
   )
   $: {
-    const newCompetenceGroup = {}
+    const newCompetenceGroup: typeof domainGroup = {}
     for (const comp of competenceByProject) {
       const domain = comp.nest_columns[CompCol.domain]
       const skill = comp.nest_columns[CompCol.skill]
@@ -50,11 +50,13 @@
 </script>
 
 <div in:fade={{ duration: pageTransitionDuration }}>
+  <StudentBanner />
+
   <div class="filter">
     <label>
       <span> Spe: </span>
       <select name="" id="" bind:value={speFilter}>
-        {#each [...speList] as spe}
+        {#each [...trainingPathList] as spe}
           <option value={spe}>{spe}</option>
         {/each}
       </select>
@@ -96,7 +98,7 @@
     justify-content: center;
     gap: 1rem;
     width: 100%;
-    padding: 1rem;
+    padding: 0 0 1rem 0;
   }
 
   .project-info {

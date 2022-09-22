@@ -1,46 +1,52 @@
 <script lang="ts">
+  import { link } from 'svelte-spa-router'
   import { fade } from 'svelte/transition'
-  
-  import { pageTransitionDuration } from '../lib/constants';
-  import { storeBase64 } from '../lib/utils'
-  import { parseCompetenciesFromHtml, parseStudentInfoFromHtml } from '../lib/competencies'
+
+  import StudentBanner from '../components/StudentBanner.svelte'
+  import { parseMyCompetenciesFromHtml, parseStudentInfoFromHtml } from '../lib/competencies'
+  import { signOut } from '../lib/student'
+  import { pageTransitionDuration } from '../routes'
+  import { myBehaviorsStore, studentInfoStore } from '../store'
 
   let files: FileList | null = null
   let isLoading = false
   let message = ''
   let error = ''
+  let finishImport = false
 
   async function parseFile() {
     message = ''
     error = ''
 
-    if (!files?.[0]) {
+    const file = files?.[0] || null
+    if (!file) {
       message = 'Please select a file.'
       return
     }
 
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    const file = files[0]
     let fileData: string
     try {
       fileData = await file.text()
     } catch (err) {
       message = 'Fail to read the file.'
-      error = err.toString()
+      error = err?.toString() || 'error'
       return
     }
 
     try {
-      const behaviors = parseCompetenciesFromHtml(fileData)
+      const behaviors = parseMyCompetenciesFromHtml(fileData)
       const studentInfos = parseStudentInfoFromHtml(fileData)
-      storeBase64('behaviors', behaviors)
-      storeBase64('student', studentInfos)
+      signOut()
+      myBehaviorsStore.set(behaviors)
+      studentInfoStore.set(studentInfos)
 
+      finishImport = true
       message = `${studentInfos.email} successfully imported.`
     } catch (err) {
       message = 'Fail to parse the file.'
-      error = err.toString()
+      error = err?.toString() || 'error'
       return
     }
   }
@@ -53,43 +59,58 @@
 </script>
 
 <div class="import" in:fade={{ duration: pageTransitionDuration }}>
-  <h1>Import my competencies</h1>
-  <span class="desc"
-    >Go to
-    <a
-      href="https://gandalf.epitech.eu/local/graph/view.php"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="active"
-    >
-      your profile
-    </a>
-    and save the html page or copy/past the page source code
-  </span>
-  <input type="file" accept="text/html, text/plain" bind:files />
-  <button on:click={onClick} disabled={isLoading}>Add</button>
+  <StudentBanner />
+
   <div>
-    <div>{message}</div>
-    <div class="error">{error}</div>
+    <h1>Import my competencies</h1>
+    {#if !finishImport}
+      <span class="desc"
+        >Go to
+        <a
+          href="https://gandalf.epitech.eu/local/graph/view.php"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="highlight"
+        >
+          your profile
+        </a>
+        and save the html page or copy/past the page source code
+      </span>
+      <input type="file" accept="text/html, text/plain" bind:files />
+      <button on:click={onClick} disabled={isLoading}>Add</button>
+    {/if}
+    <div>
+      <div>{message}</div>
+      <div class="error">{error}</div>
+    </div>
+    {#if finishImport}
+      <a href="/" use:link class="highlight">Go to home</a>
+    {/if}
   </div>
 </div>
 
 <style lang="scss">
   .import {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    flex: 1;
-  }
 
-  h1 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-  }
+    > div {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
 
-  .error {
-    color: #ff4b4b;
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .error {
+      color: #ff4b4b;
+    }
   }
 </style>

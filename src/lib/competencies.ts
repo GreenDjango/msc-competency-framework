@@ -1,6 +1,6 @@
 import { cleanDOMString } from './utils'
 
-export type Competencie = {
+export type MyBehavior = {
   domainId: string
   skillId: string
   behaviorId: string
@@ -8,7 +8,7 @@ export type Competencie = {
   projects: { id: string; href: string; status: string[] }[]
 }
 
-export function parseCompetenciesFromHtml(htmlData: string): Competencie[] {
+export function parseMyCompetenciesFromHtml(htmlData: string) {
   const parser = new globalThis.DOMParser()
   const htmlDoc = parser.parseFromString(htmlData, 'text/html')
 
@@ -27,15 +27,15 @@ export function parseCompetenciesFromHtml(htmlData: string): Competencie[] {
       const [domainId, skillSuffix] = path.split('.')
 
       const projects = rawProjects.map((proj) => {
-        const href = proj.getAttribute('href')
-        const rawId = proj.children[1].textContent || ''
+        const href = proj.getAttribute('href') || ''
+        const rawId = proj.children[1]?.textContent || ''
         const id = cleanDOMString(rawId)
-        const status = (proj.children[0].getAttribute('title') || '').split(' ')
+        const status = (proj.children[0]?.getAttribute('title') || '').split(' ')
 
         return { id, href, status }
       })
 
-      const behavior = {
+      const behavior: MyBehavior = {
         domainId,
         skillId: `${domainId}.${skillSuffix}`,
         behaviorId: path,
@@ -49,22 +49,22 @@ export function parseCompetenciesFromHtml(htmlData: string): Competencie[] {
 
       return behavior
     })
-    .filter((val) => val)
+    .filter((val) => val) as MyBehavior[]
 
   return behaviors
 }
 
 export type StudentInfo = {
-  email: string
-  cursus: string
-  trainingPath: string
-  promotion: string
-  from: string
-  resp: string
-  campus: string
+  email: string | null
+  cursus: string | null
+  trainingPath: string | null
+  promotion: string | null
+  from: string | null
+  resp: string | null
+  campus: string | null
 }
 
-export function parseStudentInfoFromHtml(htmlData: string): StudentInfo {
+export function parseStudentInfoFromHtml(htmlData: string) {
   const parser = new globalThis.DOMParser()
   const htmlDoc = parser.parseFromString(htmlData, 'text/html')
 

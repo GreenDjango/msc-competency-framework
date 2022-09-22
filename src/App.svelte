@@ -1,8 +1,10 @@
 <script lang="ts">
-  import githubLogo from './assets/github.svg'
-  import svelteLogo from './assets/svelte.svg'
   import Router, { link } from 'svelte-spa-router'
   import active from 'svelte-spa-router/active'
+
+  import githubLogo from './assets/github.svg'
+  import svelteLogo from './assets/svelte.svg'
+  import { isSignIn, signOut } from './lib/student'
   import routes from './routes'
 </script>
 
@@ -17,6 +19,9 @@
       <li><a href="/chart" use:link use:active>Chart</a></li>
       <li><a href="/my" use:link use:active>Import</a></li>
     </ul>
+    {#if $isSignIn}
+      <button class="logout" on:click={signOut}>Sign out</button>
+    {/if}
   </header>
 
   <main>
@@ -48,10 +53,13 @@
   }
 
   header {
-    padding: 1.5rem;
+    height: 4.5rem;
+    width: 100%;
+    padding: 0 1.5rem;
     background-color: #1a1a1a;
     display: flex;
     place-items: baseline;
+    align-items: center;
     gap: 1rem;
 
     .title {
@@ -77,6 +85,10 @@
       flex: 1;
       justify-content: flex-end;
       font-size: 1.1rem;
+    }
+
+    .logout {
+      padding: 0.5rem 0.8rem;
     }
   }
 

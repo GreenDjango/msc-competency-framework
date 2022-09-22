@@ -5,6 +5,8 @@ import Chart from './pages/Chart.svelte'
 import NotFound from './pages/NotFound.svelte'
 import ImportMyCompetencies from './pages/ImportMyCompetencies.svelte'
 
+export const pageTransitionDuration = 200
+
 export default {
   '/': Home,
 

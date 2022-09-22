@@ -1,27 +1,33 @@
 import { writable } from 'svelte/store'
 
-import { loadBase64, storeBase64 } from './lib/utils'
-import type { Competencie, StudentInfo } from './lib/competencies'
+import type { MyBehavior, StudentInfo } from './lib/competencies'
+import { loadBase64, removeLocalStorageItem, storeBase64 } from './lib/utils'
 
-function createCompetencies() {
-  const { subscribe, set } = writable<Competencie>(null, (set) => {
-    const data = loadBase64('competencies')
+function createMyBehaviors() {
+  const storeKey = 'my_behaviors'
+  const { subscribe, set } = writable<MyBehavior[] | null>(null, (set) => {
+    const data = loadBase64(storeKey)
     set(data)
   })
 
   return {
     subscribe,
-    set: (value: Competencie) => {
+    set: (value: MyBehavior[]) => {
       set(value)
-      storeBase64('competencies', value)
+      storeBase64(storeKey, value)
+    },
+    reset: () => {
+      set(null)
+      removeLocalStorageItem(storeKey)
     },
   }
 }
-export const competencies = createCompetencies()
+export const myBehaviorsStore = createMyBehaviors()
 
 function createStudentInfo() {
-  const { subscribe, set } = writable<StudentInfo>(null, (set) => {
-    const data = loadBase64('student')
+  const storeKey = 'student'
+  const { subscribe, set } = writable<StudentInfo | null>(null, (set) => {
+    const data = loadBase64(storeKey)
     set(data)
   })
 
@@ -29,8 +35,12 @@ function createStudentInfo() {
     subscribe,
     set: (value: StudentInfo) => {
       set(value)
-      storeBase64('student', value)
+      storeBase64(storeKey, value)
+    },
+    reset: () => {
+      set(null)
+      removeLocalStorageItem(storeKey)
     },
   }
 }
-export const studentInfo = createStudentInfo()
+export const studentInfoStore = createStudentInfo()
