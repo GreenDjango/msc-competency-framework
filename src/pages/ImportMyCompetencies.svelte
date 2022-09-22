@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
   
-  import { pageTransitionDuration } from '../constants';
+  import { pageTransitionDuration } from '../lib/constants';
   import { storeBase64 } from '../lib/utils'
   import { parseCompetenciesFromHtml, parseStudentInfoFromHtml } from '../lib/competencies'
 

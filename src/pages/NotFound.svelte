@@ -2,7 +2,7 @@
   import { fade } from 'svelte/transition'
   import { link } from 'svelte-spa-router'
 
-  import { pageTransitionDuration } from '../constants'
+  import { pageTransitionDuration } from '../lib/constants'
 </script>
 
 <div in:fade={{ duration: pageTransitionDuration }} class="p404">

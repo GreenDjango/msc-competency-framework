@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
 
-  import { pageTransitionDuration } from '../constants'
+  import { pageTransitionDuration } from '../lib/constants'
 </script>
 
 <div in:fade={{ duration: pageTransitionDuration }} class="page">

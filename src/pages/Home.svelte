@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
 
-  import { pageTransitionDuration } from '../constants'
+  import { pageTransitionDuration } from '../lib/constants'
 
   enum CompCol {
     'domain' = 0,
