@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "generate:competencies": "node ./helpers/competencyApi.js"
+    "generate:competencies": "node ./helpers/competencyApi.js --compact"
   },
   "dependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.1",

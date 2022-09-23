@@ -3,43 +3,67 @@
   import { fade } from 'svelte/transition'
 
   import StudentBanner from '../components/StudentBanner.svelte'
-  import { type TrainingPath, trainingPathList } from '../lib/constants'
+  import {
+    type BehaviorStatus,
+    type CompetencyFramework,
+    type MyBehaviorProject,
+    type TrainingPath,
+    trainingPathList,
+  } from '../lib/competencies'
+  import { findId } from '../lib/utils'
   import { pageTransitionDuration } from '../routes'
+  import { myBehaviorsStore, preferenceStore } from '../store'
 
-  enum CompCol {
-    'domain' = 0,
-    'skill',
-    'behavior',
-    'project',
-  }
+  let competencyFrameworkData: CompetencyFramework | null = null
 
-  let competencyFrameworkData: {
-    filter: string
-    nest_columns: string[]
-    size_columns: string[]
-  }[] = []
-  let speFilter: TrainingPath = 'CLO'
-  let projectFilter: string = 'null'
-  let projectList: string[] = []
-  let domainGroup: { [domain: string]: { [skill: string]: string[] } } = {}
+  let speFilter: TrainingPath = $preferenceStore?.speId || 'CLO'
+  let projectFilter: string = $preferenceStore?.projectId || 'null'
+
+  let projectList: { label: string; value: string }[] = []
+  let domainGroup: {
+    [domain: string]: {
+      [skill: string]: { label: string; status: BehaviorStatus; projects: MyBehaviorProject[] }[]
+    }
+  } = {}
 
   onMount(async () => {
-    competencyFrameworkData = (await import('../data/competency-framework.json')).default.data
+    competencyFrameworkData = (await import('../data/competency-framework.json')).default
   })
 
-  $: competenceBySpe = competencyFrameworkData.filter((val) => val.filter === speFilter)
-  $: projectList = [
-    ...new Set(competenceBySpe.map((val) => val.nest_columns[CompCol.project])),
-  ].sort((a, b) => a.localeCompare(b))
-  $: competenceByProject = competenceBySpe.filter(
-    (val) => val.nest_columns[CompCol.project] === projectFilter
-  )
+  $: {
+    preferenceStore.update((old) => ({ ...old, speId: speFilter }))
+  }
+  $: {
+    preferenceStore.update((old) => ({ ...old, projectId: projectFilter }))
+  }
+  $: projectSelected = findId(competencyFrameworkData?.projects, projectFilter) || null
+  $: {
+    const projectsId = findId(competencyFrameworkData?.trainingPath, speFilter)?.projectsId || []
+    projectList =
+      competencyFrameworkData?.projects
+        .filter((p) => projectsId.includes(p.id))
+        .map((p) => ({ label: p.label.replace('T-', ''), value: p.id }))
+        .sort((a, b) => a.label.localeCompare(b.label)) || []
+  }
+  $: behaviorsByProject =
+    competencyFrameworkData?.behaviors.filter(
+      (b) => b.trainingPathId === speFilter && b.projects.some((p) => p.projectId === projectFilter)
+    ) || []
   $: {
     const newCompetenceGroup: typeof domainGroup = {}
-    for (const comp of competenceByProject) {
-      const domain = comp.nest_columns[CompCol.domain]
-      const skill = comp.nest_columns[CompCol.skill]
-      const behavior = comp.nest_columns[CompCol.behavior]
+    for (const comp of behaviorsByProject) {
+      const domain =
+        comp.domainId + '. ' + findId(competencyFrameworkData?.domains, comp.domainId)?.label
+      const skill =
+        comp.skillId + ' ' + findId(competencyFrameworkData?.skills, comp.skillId)?.label
+
+      const myBehavior = $myBehaviorsStore?.find((val) => comp.id.includes(val.id))
+
+      const behavior = {
+        label: `${comp.id.slice(0, -4)} - ${comp.label}`,
+        status: myBehavior?.status || 'unrated',
+        projects: myBehavior?.projects || [],
+      }
 
       if (!newCompetenceGroup[domain]) newCompetenceGroup[domain] = {}
       if (!newCompetenceGroup[domain][skill]) newCompetenceGroup[domain][skill] = []
@@ -67,13 +91,26 @@
       <select name="" id="" bind:value={projectFilter}>
         <option value="null">Choose a project</option>
         {#each projectList as project}
-          <option value={project}>{project.replace('T-', '')}</option>
+          <option value={project.value}>{project.label}</option>
         {/each}
       </select>
     </label>
   </div>
 
-  <div class="project-info">
+  {#if projectSelected}
+    <div class="project-info">
+      Selected project:&nbsp;
+      {#if projectSelected.href}
+        <a href={projectSelected.href} target="_blank" rel="noopener noreferrer" class="highlight">
+          <b>{projectSelected.label}</b>
+        </a>
+      {:else}
+        <b>{projectSelected.label}</b>
+      {/if}
+    </div>
+  {/if}
+
+  <div class="project-behaviors">
     {#each Object.entries(domainGroup) as [domain, skillGroup]}
       <div class="domain-block">
         <span>{domain}</span>
@@ -82,7 +119,15 @@
             <span>{skill}</span>
             <ul>
               {#each behaviorList as behavior}
-                <li>{behavior}</li>
+                <li
+                  class:success={behavior.status === 'success'}
+                  class:failed={behavior.status === 'failed'}
+                  title={behavior.projects.map((val) => val.id).join(' ')}
+                >
+                  <span>
+                    {behavior.label}
+                  </span>
+                </li>
               {/each}
             </ul>
           {/each}
@@ -98,10 +143,17 @@
     justify-content: center;
     gap: 1rem;
     width: 100%;
-    padding: 1rem;
+    padding: 0.5rem 1rem 0 1rem;
   }
 
   .project-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 1rem 0.5rem 1rem;
+  }
+
+  .project-behaviors {
     display: flex;
     place-content: center;
     flex-wrap: wrap;
@@ -123,6 +175,20 @@
       ul {
         margin: 1rem 0;
         padding-left: 2.5rem;
+
+        > li {
+          padding-left: 0.25rem;
+          cursor: help;
+
+          &.failed {
+            list-style: outside none '✘';
+            color: rgb(218, 60, 60);
+          }
+          &.success {
+            list-style: outside none '✔';
+            color: rgb(61, 202, 61);
+          }
+        }
       }
     }
   }

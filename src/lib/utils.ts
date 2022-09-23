@@ -1,5 +1,12 @@
 import { decode, encode } from 'js-base64'
 
+export function findId<T extends { id: string | number }>(
+  array: T[] | undefined,
+  id: string | number
+) {
+  return array?.find((val) => val.id === id)
+}
+
 export function cleanDOMString(str: string) {
   return str.replaceAll('\n', '').replaceAll(/\s+/g, ' ').trim()
 }

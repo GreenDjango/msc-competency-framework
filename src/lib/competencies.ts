@@ -1,12 +1,70 @@
 import { cleanDOMString } from './utils'
 
-export type MyBehavior = {
+export type TrainingPath = 'AIA' | 'CLO' | 'DAT' | 'DIT' | 'IOT' | 'SEC' | 'VIR' | 'PGD'
+
+export const trainingPathList = new Set<TrainingPath>([
+  'AIA',
+  'CLO',
+  'DAT',
+  'DIT',
+  'IOT',
+  'SEC',
+  'VIR',
+  'PGD',
+])
+
+export type CompetencyFramework = {
+  trainingPath: TrainingPathNode[]
+  projects: ProjectNode[]
+  domains: DomainNode[]
+  skills: SkillNode[]
+  behaviors: BehaviorNode[]
+}
+export interface TrainingPathNode {
+  id: string
+  label: string
+  projectsId: string[]
+}
+export interface ProjectNode {
+  id: string
+  label: string
+  href?: string
+}
+export interface DomainNode {
+  id: string
+  label: string
+  skillsId: string[]
+}
+export interface SkillNode {
+  id: string
+  label: string
+  domainId: string
+  behaviorsId: string[]
+}
+export interface BehaviorNode {
+  id: string
+  label: string
   domainId: string
   skillId: string
-  behaviorId: string
-  title: string
-  projects: { id: string; href: string; status: string[] }[]
+  trainingPathId: string
+  projects: ProjectsEntity[]
 }
+export interface ProjectsEntity {
+  projectId: string
+  weight: number
+}
+
+export type MyBehavior = {
+  id: string
+  domainId: string
+  skillId: string
+  title: string
+  status: BehaviorStatus
+  projects: MyBehaviorProject[]
+}
+export type BehaviorStatus = 'success' | 'failed' | 'unrated'
+export type MyBehaviorProject = { id: string; href: string; expectation: ProjectExpectation }
+export type ProjectExpectation = 'above' | 'meets' | 'below' | 'failed' | 'unrated'
 
 export function parseMyCompetenciesFromHtml(htmlData: string) {
   const parser = new globalThis.DOMParser()
@@ -29,20 +87,37 @@ export function parseMyCompetenciesFromHtml(htmlData: string) {
       const projects = rawProjects.map((proj) => {
         const href = proj.getAttribute('href') || ''
         const rawId = proj.children[1]?.textContent || ''
-        const id = cleanDOMString(rawId)
+        const id = cleanDOMString(rawId).split('_')[0]
         const status = (proj.children[0]?.getAttribute('title') || '').split(' ')
+        let expectation: ProjectExpectation = 'unrated'
+        if (status.includes('above')) {
+          expectation = 'above'
+        } else if (status.includes('success')) {
+          expectation = 'meets'
+        } else if (status.includes('below')) {
+          expectation = 'below'
+        } else if (status.includes('failed')) {
+          expectation = 'failed'
+        }
 
-        return { id, href, status }
+        return { id, href, expectation } as MyBehaviorProject
       })
+      let status: BehaviorStatus = 'unrated'
+      if (projects.some((p) => p.expectation === 'above' || p.expectation === 'meets')) {
+        status = 'success'
+      } else if (projects.some((p) => p.expectation === 'below' || p.expectation === 'failed')) {
+        status = 'failed'
+      }
 
       const behavior: MyBehavior = {
         domainId,
         skillId: `${domainId}.${skillSuffix}`,
-        behaviorId: path,
+        id: path,
         title,
+        status,
         projects,
       }
-      if (!competencyTitle || !behavior.behaviorId || !behavior.title) {
+      if (!competencyTitle || !behavior.id || !behavior.title) {
         console.warn('Fail to import a behavior:', val, behavior)
         return null
       }
