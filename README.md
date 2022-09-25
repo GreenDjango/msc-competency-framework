@@ -2,6 +2,15 @@
 
 Better MSC competencies overview.
 
+**See https://greendjango.github.io/msc-competency-framework**
+
+## Install
+
+```shell
+$ git clone git@github.com:GreenDjango/msc-competency-framework.git && cd msc-competency-framework
+$ yarn install
+```
+
 ## Build
 
 All shortcuts are available with the `yarn run` or `npm run`:
