@@ -65,7 +65,8 @@ a {
     color: #dadada;
     text-decoration: underline;
   }
-  &.active, &.highlight {
+  &.active,
+  &.highlight {
     color: #646cff;
   }
 }

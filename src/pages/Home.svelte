@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
 
+  import Icon from '../components/Icon.svelte'
   import StudentBanner from '../components/StudentBanner.svelte'
   import {
     type BehaviorStatus,
@@ -22,7 +23,12 @@
   let projectList: { label: string; value: string }[] = []
   let domainGroup: {
     [domain: string]: {
-      [skill: string]: { label: string; status: BehaviorStatus; projects: MyBehaviorProject[] }[]
+      [skill: string]: {
+        label: string
+        status: BehaviorStatus
+        weight: number
+        projects: MyBehaviorProject[]
+      }[]
     }
   } = {}
 
@@ -47,7 +53,9 @@
   }
   $: behaviorsByProject =
     competencyFrameworkData?.behaviors.filter(
-      (b) => b.trainingPathId === speFilter && b.projects.some((p) => p.projectId === projectFilter)
+      (b) =>
+        b.trainingPathId === speFilter &&
+        b.projects.some((p) => p.projectId === projectSelected?.id)
     ) || []
   $: {
     const newCompetenceGroup: typeof domainGroup = {}
@@ -56,12 +64,14 @@
         comp.domainId + '. ' + findId(competencyFrameworkData?.domains, comp.domainId)?.label
       const skill =
         comp.skillId + ' ' + findId(competencyFrameworkData?.skills, comp.skillId)?.label
+      const weight = comp.projects.find((p) => p.projectId === projectSelected?.id)?.weight ?? -1
 
-      const myBehavior = $myBehaviorsStore?.find((val) => comp.id.includes(val.id))
+      const myBehavior = $myBehaviorsStore?.find((b) => comp.id.includes(b.id))
 
       const behavior = {
         label: `${comp.id.slice(0, -4)} - ${comp.label}`,
         status: myBehavior?.status || 'unrated',
+        weight,
         projects: myBehavior?.projects || [],
       }
 
@@ -122,10 +132,23 @@
                 <li
                   class:success={behavior.status === 'success'}
                   class:failed={behavior.status === 'failed'}
-                  title={behavior.projects.map((val) => val.id).join(' ')}
+                  class:warning={behavior.status === 'unrated'}
+                  title="Project's behavior weight: {behavior.weight}"
                 >
-                  <span>
-                    {behavior.label}
+                  <span class="status">
+                    {#if behavior.status === 'success'}
+                      <Icon name="circle-check" />
+                    {:else if behavior.status === 'failed'}
+                      <Icon name="circle-xmark" />
+                    {:else if behavior.status === 'unrated'}
+                      <Icon name="triangle-exclamation" />
+                    {/if}
+                  </span><span
+                    class:indicator={behavior.weight > 1}
+                    class="label"
+                    style="--number-indicator: 'x{behavior.weight}'"
+                  >
+                    <span>{behavior.label}</span>
                   </span>
                 </li>
               {/each}
@@ -174,19 +197,43 @@
 
       ul {
         margin: 1rem 0;
-        padding-left: 2.5rem;
+        padding-left: 1.5rem;
 
         > li {
-          padding-left: 0.25rem;
+          list-style: none;
           cursor: help;
 
           &.failed {
-            list-style: outside none '✘';
             color: rgb(218, 60, 60);
           }
           &.success {
-            list-style: outside none '✔';
             color: rgb(61, 202, 61);
+          }
+          &.warning {
+            color: rgb(218, 131, 60);
+          }
+
+          .status {
+            display: inline-block;
+            height: 1rem;
+            width: 1rem;
+            margin-right: 0.3rem;
+            vertical-align: top;
+          }
+
+          .label {
+            > span {
+              padding-right: 0.5rem;
+            }
+
+            &.indicator::after {
+              content: var(--number-indicator, '0');
+              background-color: #646cff;
+              color: white;
+              font-size: 0.9rem;
+              padding: 0.35rem 0.3rem 0.15rem 0.3rem;
+              border-radius: 10px;
+            }
           }
         }
       }
