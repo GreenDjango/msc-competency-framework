@@ -2,18 +2,34 @@
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
 
-  import Icon from '../components/Icon.svelte'
+  import Icon, { type IconName } from '../components/Icon.svelte'
   import StudentBanner from '../components/StudentBanner.svelte'
   import {
     type BehaviorStatus,
     type CompetencyFramework,
-    type MyBehaviorProject,
+    type ProjectExpectation,
+    type ProjectNode,
     type TrainingPath,
+    sortProjectExpectation,
     trainingPathList,
   } from '../lib/competencies'
   import { findId } from '../lib/utils'
   import { pageTransitionDuration } from '../routes'
   import { myBehaviorsStore, preferenceStore } from '../store'
+
+  const iconStatusMap: { [key in BehaviorStatus]: IconName } = {
+    success: 'circle-check',
+    failed: 'circle-xmark',
+    unrated: 'triangle-exclamation',
+  }
+  const iconExpectationMap: { [key in ProjectExpectation | 'none']: IconName } = {
+    above: 'star',
+    meets: 'circle-check',
+    below: 'triangle-exclamation',
+    failed: 'circle-xmark',
+    unrated: 'circle-exclamation',
+    none: 'circle-question',
+  }
 
   let competencyFrameworkData: CompetencyFramework | null = null
 
@@ -27,7 +43,8 @@
         label: string
         status: BehaviorStatus | 'none'
         weight: number
-        projects: MyBehaviorProject[]
+        projects: (ProjectNode & { expectation: ProjectExpectation | 'none' })[]
+        isExtended: boolean
       }[]
     }
   } = {}
@@ -68,11 +85,25 @@
 
       const myBehavior = $myBehaviorsStore?.find((b) => comp.id.includes(b.id))
 
+      const projects = comp.projects
+        .map((p) => findId(competencyFrameworkData?.projects, p.projectId)!)
+        .filter((p) => p && p.id)
+        .map((p) => {
+          const myProject = myBehavior?.projects.find((p2) => p2.id === p.id)
+          return { ...p, expectation: myProject?.expectation || ('none' as 'none') }
+        })
+
+      myBehavior?.projects.forEach((p) => {
+        if (!p.id.includes('T-PRO-') || p.expectation === 'unrated') return
+        projects.push({ id: p.id, label: p.id, expectation: p.expectation, href: p.href })
+      })
+
       const behavior = {
         label: `${comp.id.slice(0, -4)} - ${comp.label}`,
         status: myBehavior?.status || ('none' as 'none'),
         weight,
-        projects: myBehavior?.projects || [],
+        projects: projects.sort((a, b) => sortProjectExpectation(a.expectation, b.expectation)),
+        isExtended: false,
       }
 
       if (!newCompetenceGroup[domain]) newCompetenceGroup[domain] = {}
@@ -134,25 +165,40 @@
                   class:failed={behavior.status === 'failed'}
                   class:warning={behavior.status === 'unrated'}
                   title="Project's behavior weight: {behavior.weight}"
+                  on:click={() => (behavior.isExtended = !behavior.isExtended)}
                 >
                   {#if behavior.status === 'none'}
                     <span>•</span>
                   {:else}
                     <span class="status">
-                      {#if behavior.status === 'success'}
-                        <Icon name="circle-check" />
-                      {:else if behavior.status === 'failed'}
-                        <Icon name="circle-xmark" />
-                      {:else if behavior.status === 'unrated'}
-                        <Icon name="triangle-exclamation" />
-                      {/if}
-                    </span>{/if}<span
+                      <Icon name={iconStatusMap[behavior.status]} />
+                    </span>
+                  {/if}
+                  <span
                     class:indicator={behavior.weight > 1}
                     class="label"
                     style="--number-indicator: 'x{behavior.weight}'"
                   >
                     <span>{behavior.label}</span>
                   </span>
+                  {#if behavior.isExtended}
+                    <div class="projects">
+                      {#each behavior.projects as project}
+                        <div
+                          class:success={project.expectation === 'above' ||
+                            project.expectation === 'meets'}
+                          class:failed={project.expectation === 'failed'}
+                          class:warning={project.expectation === 'below'}
+                          class:info={project.expectation === 'unrated'}
+                        >
+                          <span class="expectation">
+                            <Icon name={iconExpectationMap[project.expectation]} />
+                          </span>
+                          {project.label}
+                        </div>
+                      {/each}
+                    </div>
+                  {/if}
                 </li>
               {/each}
             </ul>
@@ -161,6 +207,26 @@
       </div>
     {/each}
   </div>
+
+  {#if projectSelected}
+    <div class="legend">
+      <ul>
+        {#each Object.entries(iconExpectationMap) as [type, icon]}
+          <li
+            class:success={type === 'above' || type === 'meets'}
+            class:failed={type === 'failed'}
+            class:warning={type === 'below'}
+            class:info={type === 'unrated'}
+          >
+            <span class="icon">
+              <Icon name={icon} />
+            </span>
+            {type}
+          </li>
+        {/each}
+      </ul>
+    </div>
+  {/if}
 </div>
 
 <style lang="scss">
@@ -187,7 +253,7 @@
     padding: 0 2rem;
 
     .domain-block {
-      width: 30rem;
+      width: 35rem;
       border: 1px solid #4e4e4e;
       border-radius: 0.25rem;
       padding: 1rem;
@@ -206,21 +272,10 @@
           list-style: none;
           cursor: help;
 
-          &.failed {
-            color: rgb(218, 60, 60);
-          }
-          &.success {
-            color: rgb(61, 202, 61);
-          }
-          &.warning {
-            color: rgb(218, 131, 60);
-          }
-
           .status {
             display: inline-block;
             height: 1rem;
             width: 1rem;
-            margin-right: 0.3rem;
             vertical-align: top;
           }
 
@@ -238,8 +293,63 @@
               border-radius: 10px;
             }
           }
+
+          .projects {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0.25rem 0 0.5rem 2rem;
+            color: var(--bc);
+            font-size: 0.9rem;
+
+            > div {
+              .expectation {
+                display: inline-block;
+                height: 1rem;
+                width: 1rem;
+                vertical-align: top;
+              }
+
+              margin-left: 0.5rem;
+            }
+          }
         }
       }
     }
+  }
+
+  .legend {
+    padding: 1rem 0;
+
+    > ul {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      column-gap: 1rem;
+
+      > li {
+        list-style: none;
+        text-transform: capitalize;
+
+        .icon {
+          display: inline-block;
+          height: 1rem;
+          width: 1rem;
+          vertical-align: top;
+        }
+      }
+    }
+  }
+
+  .failed {
+    color: rgb(218, 60, 60);
+  }
+  .success {
+    color: rgb(61, 202, 61);
+  }
+  .warning {
+    color: rgb(218, 131, 60);
+  }
+  .info {
+    color: rgb(63, 139, 253);
   }
 </style>

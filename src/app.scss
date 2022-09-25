@@ -5,8 +5,10 @@
   font-weight: 400;
 
   color-scheme: /*light*/ dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  --bc: rgba(255, 255, 255, 0.87);
+  color: var(--bc);
+  --b: #242424;
+  background-color: var(--b);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;

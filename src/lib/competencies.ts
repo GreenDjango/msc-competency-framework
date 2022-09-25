@@ -190,3 +190,18 @@ export function parseStudentInfoFromHtml(htmlData: string) {
 
   return infos
 }
+
+export function sortProjectExpectation(
+  a: ProjectExpectation | 'none',
+  b: ProjectExpectation | 'none'
+) {
+  const projectExpectationOrder: { [key in ProjectExpectation | 'none']: number } = {
+    above: 5,
+    meets: 4,
+    below: 3,
+    failed: 2,
+    unrated: 1,
+    none: 0,
+  }
+  return projectExpectationOrder[b] - projectExpectationOrder[a]
+}

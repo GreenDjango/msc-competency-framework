@@ -53,20 +53,31 @@
   }
 
   header {
-    height: 4.5rem;
+    min-height: 4.5rem;
     width: 100%;
-    padding: 0 1.5rem;
+    padding: 1rem 1.5rem;
     background-color: #1a1a1a;
     display: flex;
+    flex-direction: column;
     place-items: baseline;
     align-items: center;
     gap: 1rem;
 
+    @media (min-width: 768px) {
+      padding: 0 1.5rem;
+      flex-direction: row;
+    }
+
     .title {
       display: flex;
+      flex-direction: column;
       gap: 1rem;
       align-items: baseline;
       text-decoration: none;
+
+      @media (min-width: 768px) {
+        flex-direction: row;
+      }
 
       h2 {
         font-size: 1.5rem;

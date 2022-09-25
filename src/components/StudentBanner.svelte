@@ -19,8 +19,9 @@
 
     > div {
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
-      gap: 1.5rem;
+      column-gap: 1.5rem;
       width: 100%;
       padding: 1rem 1rem 0 1rem;
     }
