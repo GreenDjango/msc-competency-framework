@@ -25,7 +25,7 @@
     [domain: string]: {
       [skill: string]: {
         label: string
-        status: BehaviorStatus
+        status: BehaviorStatus | 'none'
         weight: number
         projects: MyBehaviorProject[]
       }[]
@@ -70,7 +70,7 @@
 
       const behavior = {
         label: `${comp.id.slice(0, -4)} - ${comp.label}`,
-        status: myBehavior?.status || 'unrated',
+        status: myBehavior?.status || ('none' as 'none'),
         weight,
         projects: myBehavior?.projects || [],
       }
@@ -135,15 +135,18 @@
                   class:warning={behavior.status === 'unrated'}
                   title="Project's behavior weight: {behavior.weight}"
                 >
-                  <span class="status">
-                    {#if behavior.status === 'success'}
-                      <Icon name="circle-check" />
-                    {:else if behavior.status === 'failed'}
-                      <Icon name="circle-xmark" />
-                    {:else if behavior.status === 'unrated'}
-                      <Icon name="triangle-exclamation" />
-                    {/if}
-                  </span><span
+                  {#if behavior.status === 'none'}
+                    <span>•</span>
+                  {:else}
+                    <span class="status">
+                      {#if behavior.status === 'success'}
+                        <Icon name="circle-check" />
+                      {:else if behavior.status === 'failed'}
+                        <Icon name="circle-xmark" />
+                      {:else if behavior.status === 'unrated'}
+                        <Icon name="triangle-exclamation" />
+                      {/if}
+                    </span>{/if}<span
                     class:indicator={behavior.weight > 1}
                     class="label"
                     style="--number-indicator: 'x{behavior.weight}'"
