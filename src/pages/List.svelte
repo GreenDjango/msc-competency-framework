@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
 
   import ExpectationLegend, { iconExpectationMap } from '../components/ExpectationLegend.svelte'
   import Icon, { type IconName } from '../components/Icon.svelte'
   import StudentBanner from '../components/StudentBanner.svelte'
-  import type { BehaviorStatus, MyBehavior } from '../lib/competencies'
+  import type { BehaviorStatus, CompetencyFramework, MyBehavior } from '../lib/competencies'
+  import { findId } from '../lib/utils'
   import { pageTransitionDuration } from '../routes'
   import { myBehaviorsStore } from '../store'
 
@@ -14,72 +16,122 @@
     unrated: 'triangle-exclamation',
   }
 
-  let statusGroup: Map<BehaviorStatus, MyBehavior[]> = new Map()
+  let competencyFrameworkData: CompetencyFramework | null = null
+
+  const statusGroup: { [status: string]: { [domain: string]: MyBehavior[] } } = {
+    failed: {},
+    unrated: {},
+    success: {},
+  }
+
+  let isExpanded = false
 
   $: {
-    const behaviorFailed =
+    const failedBehaviors =
       $myBehaviorsStore?.filter((behavior) => behavior.status === 'failed') || []
-    const behaviorUnrated =
-      $myBehaviorsStore?.filter((behavior) => behavior.status === 'unrated') || []
-    const behaviorSuccess =
-      $myBehaviorsStore?.filter((behavior) => behavior.status === 'success') || []
-    statusGroup = new Map([
-      ['failed', behaviorFailed],
-      ['unrated', behaviorUnrated],
-      ['success', behaviorSuccess],
-    ])
-    statusGroup.entries
+    statusGroup.failed = {}
+    for (const behavior of failedBehaviors) {
+      const domain =
+        behavior.domainId +
+        '. ' +
+        findId(competencyFrameworkData?.domains, behavior.domainId)?.label
+      statusGroup.failed[domain] ??= []
+      statusGroup.failed[domain].push(behavior)
+    }
   }
+
+  $: {
+    const unratedBehaviors =
+      $myBehaviorsStore?.filter((behavior) => behavior.status === 'unrated') || []
+    statusGroup.unrated = {}
+    for (const behavior of unratedBehaviors) {
+      const domain =
+        behavior.domainId +
+        '. ' +
+        findId(competencyFrameworkData?.domains, behavior.domainId)?.label
+      statusGroup.unrated[domain] ??= []
+      statusGroup.unrated[domain].push(behavior)
+    }
+  }
+
+  $: {
+    const successBehaviors =
+      $myBehaviorsStore?.filter((behavior) => behavior.status === 'success') || []
+    statusGroup.success = {}
+    for (const behavior of successBehaviors) {
+      const domain =
+        behavior.domainId +
+        '. ' +
+        findId(competencyFrameworkData?.domains, behavior.domainId)?.label
+      statusGroup.success[domain] ??= []
+      statusGroup.success[domain].push(behavior)
+    }
+  }
+
+  onMount(async () => {
+    competencyFrameworkData = (await import('../data/competency-framework.json')).default
+  })
 </script>
 
 <div in:fade={{ duration: pageTransitionDuration }}>
   <StudentBanner />
 
+  <div class="filter">
+    <button on:click={() => (isExpanded = !isExpanded)}>{isExpanded ? 'Collapse' : 'Expand'}</button
+    >
+  </div>
+
   <div class="project-behaviors">
-    {#each [...statusGroup] as [status, myBehaviors]}
+    {#each Object.entries(statusGroup) as [status, domainGroup]}
       <div class="domain-block">
         <span>{status}</span>
 
-        <ul>
-          {#each myBehaviors as behavior}
-            <li
-              class:success={behavior.status === 'success'}
-              class:failed={behavior.status === 'failed'}
-              class:warning={behavior.status === 'unrated'}
-            >
-              <details>
-                <summary>
-                  <span class="status">
-                    <Icon name={iconStatusMap[behavior.status]} />
-                  </span>
-                  <span class="label">
-                    <span>{behavior.title}</span>
-                  </span>
-                </summary>
-
-                <div class="projects">
-                  {#each behavior.projects as project}
-                    <a
-                      class:success={project.expectation === 'above' ||
-                        project.expectation === 'meets'}
-                      class:failed={project.expectation === 'failed'}
-                      class:warning={project.expectation === 'below'}
-                      class:info={project.expectation === 'unrated'}
-                      href={project.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <span class="expectation">
-                        <Icon name={iconExpectationMap[project.expectation]} />
+        {#each Object.entries(domainGroup) as [domain, myBehaviors]}
+          <div>
+            <span>{domain}</span>
+            <ul>
+              {#each myBehaviors as behavior, idx}
+                <li>
+                  <details open={isExpanded}>
+                    <summary>
+                      <span
+                        class="status"
+                        class:success={behavior.status === 'success'}
+                        class:failed={behavior.status === 'failed'}
+                        class:warning={behavior.status === 'unrated'}
+                      >
+                        <Icon name={iconStatusMap[behavior.status]} />
                       </span>
-                      {project.id}
-                    </a>
-                  {/each}
-                </div>
-              </details>
-            </li>
-          {/each}
-        </ul>
+                      <span class="label">
+                        <span>{behavior.id} - {behavior.title}</span>
+                      </span>
+                    </summary>
+
+                    <div class="projects">
+                      {#each behavior.projects as project}
+                        <a
+                          class:success={project.expectation === 'above' ||
+                            project.expectation === 'meets'}
+                          class:failed={project.expectation === 'failed'}
+                          class:warning={project.expectation === 'below'}
+                          class:info={project.expectation === 'unrated'}
+                          href={project.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <span class="expectation">
+                            <Icon name={iconExpectationMap[project.expectation]} />
+                          </span>
+                          {project.id}
+                        </a>
+                      {/each}
+                    </div>
+                  </details>
+                </li>
+              {/each}
+            </ul>
+          </div>
+        {/each}
       </div>
     {/each}
   </div>
@@ -88,13 +140,20 @@
 </div>
 
 <style lang="scss">
+  .filter {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    padding: 1rem 1rem 0.5rem 1rem;
+  }
+
   .project-behaviors {
     display: flex;
     place-content: center;
     flex-wrap: wrap;
     gap: 0.5rem;
     padding: 0 2rem;
-    margin-top: 1rem;
 
     .domain-block {
       width: 35rem;
