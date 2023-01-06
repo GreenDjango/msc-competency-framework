@@ -44,7 +44,6 @@
         status: BehaviorStatus | 'none'
         weight: number
         projects: (ProjectNode & { expectation: ProjectExpectation | 'none' })[]
-        isExtended: boolean
       }[]
     }
   } = {}
@@ -103,7 +102,6 @@
         status: myBehavior?.status || ('none' as 'none'),
         weight,
         projects: projects.sort((a, b) => sortProjectExpectation(a.expectation, b.expectation)),
-        isExtended: false,
       }
 
       if (!newCompetenceGroup[domain]) newCompetenceGroup[domain] = {}
@@ -165,23 +163,25 @@
                   class:failed={behavior.status === 'failed'}
                   class:warning={behavior.status === 'unrated'}
                   title="Project's behavior weight: {behavior.weight}"
-                  on:click={() => (behavior.isExtended = !behavior.isExtended)}
                 >
-                  {#if behavior.status === 'none'}
-                    <span>•</span>
-                  {:else}
-                    <span class="status">
-                      <Icon name={iconStatusMap[behavior.status]} />
-                    </span>
-                  {/if}
-                  <span
-                    class:indicator={behavior.weight > 1}
-                    class="label"
-                    style="--number-indicator: 'x{behavior.weight}'"
-                  >
-                    <span>{behavior.label}</span>
-                  </span>
-                  {#if behavior.isExtended}
+                  <details>
+                    <summary>
+                      {#if behavior.status === 'none'}
+                        <span>•</span>
+                      {:else}
+                        <span class="status">
+                          <Icon name={iconStatusMap[behavior.status]} />
+                        </span>
+                      {/if}
+                      <span
+                        class:indicator={behavior.weight > 1}
+                        class="label"
+                        style="--number-indicator: 'x{behavior.weight}'"
+                      >
+                        <span>{behavior.label}</span>
+                      </span>
+                    </summary>
+
                     <div class="projects">
                       {#each behavior.projects as project}
                         <div
@@ -198,7 +198,7 @@
                         </div>
                       {/each}
                     </div>
-                  {/if}
+                  </details>
                 </li>
               {/each}
             </ul>
@@ -271,6 +271,14 @@
         > li {
           list-style: none;
           cursor: help;
+
+          summary {
+            list-style: none;
+
+            &::-webkit-details-marker {
+              display: none;
+            }
+          }
 
           .status {
             display: inline-block;
