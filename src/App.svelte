@@ -16,6 +16,9 @@
     </a>
     <ul class="nav">
       <li><a href="/" use:link use:active>Home</a></li>
+      {#if $isSignIn}
+        <li><a href="/list" use:link use:active>List</a></li>
+      {/if}
       <li><a href="/chart" use:link use:active>Chart</a></li>
       <li><a href="/my" use:link use:active>Import</a></li>
     </ul>

@@ -1,14 +1,15 @@
-// import wrap from 'svelte-spa-router/wrap'
-
-import Home from './pages/Home.svelte'
 import Chart from './pages/Chart.svelte'
-import NotFound from './pages/NotFound.svelte'
+import Home from './pages/Home.svelte'
 import ImportMyCompetencies from './pages/ImportMyCompetencies.svelte'
+import List from './pages/List.svelte'
+import NotFound from './pages/NotFound.svelte'
 
 export const pageTransitionDuration = 200
 
 export default {
   '/': Home,
+
+  '/list': List,
 
   '/chart': Chart,
 

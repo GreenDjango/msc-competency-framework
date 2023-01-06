@@ -1,9 +1,6 @@
 import { decode, encode } from 'js-base64'
 
-export function findId<T extends { id: string | number }>(
-  array: T[] | undefined,
-  id: string | number
-) {
+export function findId<T extends { id: B }, B>(array: T[] | undefined, id: B) {
   return array?.find((val) => val.id === id)
 }
 

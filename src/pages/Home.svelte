@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
 
+  import ExpectationLegend, { iconExpectationMap } from '../components/ExpectationLegend.svelte'
   import Icon, { type IconName } from '../components/Icon.svelte'
   import StudentBanner from '../components/StudentBanner.svelte'
   import {
@@ -21,14 +22,6 @@
     success: 'circle-check',
     failed: 'circle-xmark',
     unrated: 'triangle-exclamation',
-  }
-  const iconExpectationMap: { [key in ProjectExpectation | 'none']: IconName } = {
-    above: 'star',
-    meets: 'circle-check',
-    below: 'triangle-exclamation',
-    failed: 'circle-xmark',
-    unrated: 'circle-exclamation',
-    none: 'circle-question',
   }
 
   let competencyFrameworkData: CompetencyFramework | null = null
@@ -60,7 +53,8 @@
   }
   $: projectSelected = findId(competencyFrameworkData?.projects, projectFilter) || null
   $: {
-    const projectsId = findId(competencyFrameworkData?.trainingPath, speFilter)?.projectsId || []
+    const projectsId =
+      findId(competencyFrameworkData?.trainingPath, speFilter as string)?.projectsId || []
     projectList =
       competencyFrameworkData?.projects
         .filter((p) => projectsId.includes(p.id))
@@ -209,23 +203,7 @@
   </div>
 
   {#if projectSelected}
-    <div class="legend">
-      <ul>
-        {#each Object.entries(iconExpectationMap) as [type, icon]}
-          <li
-            class:success={type === 'above' || type === 'meets'}
-            class:failed={type === 'failed'}
-            class:warning={type === 'below'}
-            class:info={type === 'unrated'}
-          >
-            <span class="icon">
-              <Icon name={icon} />
-            </span>
-            {type}
-          </li>
-        {/each}
-      </ul>
-    </div>
+    <ExpectationLegend />
   {/if}
 </div>
 
@@ -320,29 +298,6 @@
               margin-left: 0.5rem;
             }
           }
-        }
-      }
-    }
-  }
-
-  .legend {
-    padding: 1rem 0;
-
-    > ul {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      column-gap: 1rem;
-
-      > li {
-        list-style: none;
-        text-transform: capitalize;
-
-        .icon {
-          display: inline-block;
-          height: 1rem;
-          width: 1rem;
-          vertical-align: top;
         }
       }
     }
