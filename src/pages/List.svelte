@@ -103,6 +103,7 @@
       padding: 1rem;
 
       > span {
+        text-transform: capitalize;
         font-weight: bold;
         font-size: 0.9rem;
         line-height: 2;
