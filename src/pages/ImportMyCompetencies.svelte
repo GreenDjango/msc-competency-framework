@@ -5,7 +5,7 @@
   import StudentBanner from '../components/StudentBanner.svelte'
   import { parseMyCompetenciesFromHtml, parseStudentInfoFromHtml } from '../lib/competencies'
   import { signOut } from '../lib/student'
-  import { pageTransitionDuration } from '../routes'
+  import { pageTransitionDuration } from '../lib/config'
   import { myBehaviorsStore, studentInfoStore } from '../store'
 
   let files: FileList | null = null

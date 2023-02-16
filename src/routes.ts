@@ -4,8 +4,6 @@ import ImportMyCompetencies from './pages/ImportMyCompetencies.svelte'
 import List from './pages/List.svelte'
 import NotFound from './pages/NotFound.svelte'
 
-export const pageTransitionDuration = 200
-
 export default {
   '/': Home,
 

@@ -16,7 +16,7 @@
   } from '../lib/competencies'
   import { ApplyFilterProjectToDomainGroup } from '../lib/filter'
   import { findId } from '../lib/utils'
-  import { pageTransitionDuration } from '../routes'
+  import { pageTransitionDuration } from '../lib/config'
   import { myBehaviorsStore, preferenceStore } from '../store'
 
   const iconStatusMap: { [key in BehaviorStatus]: IconName } = {

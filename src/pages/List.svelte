@@ -7,7 +7,7 @@
   import StudentBanner from '../components/StudentBanner.svelte'
   import type { BehaviorStatus, CompetencyFramework, MyBehavior } from '../lib/competencies'
   import { findId } from '../lib/utils'
-  import { pageTransitionDuration } from '../routes'
+  import { pageTransitionDuration } from '../lib/config'
   import { myBehaviorsStore } from '../store'
 
   const iconStatusMap: { [key in BehaviorStatus]: IconName } = {
