@@ -32,7 +32,6 @@ export function ApplyFilterProjectToDomainGroup(data: domainGroup, selectedProje
           if (target.expectation == 'below') skill.status = 'unrated'
           if (target.expectation == 'unrated' || target.expectation == 'none') skill.status = 'none'
         }
-        console.log(target?.expectation)
       }
     }
   })
