@@ -14,6 +14,7 @@
     sortProjectExpectation,
     trainingPathList,
   } from '../lib/competencies'
+  import { ApplyFilterProjectToDomainGroup } from '../lib/filter'
   import { findId } from '../lib/utils'
   import { pageTransitionDuration } from '../routes'
   import { myBehaviorsStore, preferenceStore } from '../store'
@@ -28,6 +29,7 @@
 
   let speFilter: TrainingPath = $preferenceStore?.speId || 'CLO'
   let projectFilter: string = $preferenceStore?.projectId || 'null'
+  let scopeToProject: boolean = false
 
   let projectList: { label: string; value: string }[] = []
   let domainGroup: {
@@ -141,10 +143,14 @@
         <b>{projectSelected.label}</b>
       {/if}
     </div>
+    <div class="project-scope">
+      <span>Scope to project:&nbsp;</span>
+      <input type="checkbox" bind:checked={scopeToProject} />
+    </div>
   {/if}
 
   <div class="project-behaviors">
-    {#each Object.entries(domainGroup) as [domain, skillGroup]}
+    {#each Object.entries(scopeToProject ? ApplyFilterProjectToDomainGroup(domainGroup, projectFilter) : domainGroup) as [domain, skillGroup]}
       <div class="domain-block">
         <span>{domain}</span>
         <div>
@@ -221,6 +227,13 @@
     align-items: center;
     justify-content: center;
     padding: 1rem 1rem 0.5rem 1rem;
+  }
+
+  .project-scope {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
   }
 
   .project-behaviors {
