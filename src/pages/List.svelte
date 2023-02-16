@@ -84,7 +84,12 @@
   <div class="project-behaviors">
     {#each Object.entries(statusGroup) as [status, domainGroup]}
       <div class="domain-block">
-        <span>{status}</span>
+        <span
+          >{status} - {Object.entries(domainGroup).reduce(
+            (prev, current) => prev + current[1].length,
+            0
+          )}</span
+        >
 
         {#each Object.entries(domainGroup) as [domain, myBehaviors]}
           <div>
