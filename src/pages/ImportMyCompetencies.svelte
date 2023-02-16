@@ -3,10 +3,10 @@
   import { fade } from 'svelte/transition'
 
   import StudentBanner from '../components/StudentBanner.svelte'
-  import { parseMyCompetenciesFromHtml, parseStudentInfoFromHtml } from '../lib/competencies'
+  import { parseMyCompetenciesFromHtml, parseStudentInfoFromHtml } from '../lib/parser'
   import { signOut } from '../lib/student'
   import { pageTransitionDuration } from '../lib/config'
-  import { myBehaviorsStore, studentInfoStore } from '../store'
+  import { lastImportInfoStore, myBehaviorsStore, studentInfoStore } from '../store'
 
   let files: FileList | null = null
   let isLoading = false

@@ -1,7 +1,7 @@
 import { get, writable } from 'svelte/store'
 
 import type {
-  // ImportInfo,
+  ImportInfo,
   MyBehavior,
   StudentInfo,
   TrainingPath,
@@ -38,4 +38,4 @@ export const myBehaviorsStore = persistentStoreFactory<MyBehavior[]>('my_behavio
 
 export const studentInfoStore = persistentStoreFactory<StudentInfo>('student')
 
-// export const lastImportInfoStore = persistentStoreFactory<ImportInfo>('import_info')
+export const lastImportInfoStore = persistentStoreFactory<ImportInfo>('last_import_info')
