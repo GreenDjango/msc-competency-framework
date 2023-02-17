@@ -2,10 +2,16 @@
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
 
-  import ExpectationLegend, { iconExpectationMap } from '../components/ExpectationLegend.svelte'
+  import ExpectationLegend, {
+    iconExpectationMap,
+  } from '../components/ExpectationLegend.svelte'
   import Icon, { type IconName } from '../components/Icon.svelte'
   import StudentBanner from '../components/StudentBanner.svelte'
-  import type { BehaviorStatus, CompetencyFramework, MyBehavior } from '../lib/competencies'
+  import type {
+    BehaviorStatus,
+    CompetencyFramework,
+    MyBehavior,
+  } from '../lib/competencies'
   import { findId } from '../lib/utils'
   import { pageTransitionDuration } from '../lib/config'
   import { myBehaviorsStore } from '../store'
@@ -77,25 +83,26 @@
   <StudentBanner />
 
   <div class="filter">
-    <button on:click={() => (isExpanded = !isExpanded)}>{isExpanded ? 'Collapse' : 'Expand'}</button
-    >
+    <button on:click={() => (isExpanded = !isExpanded)}>
+      {isExpanded ? 'Collapse' : 'Expand'}
+    </button>
   </div>
 
   <div class="project-behaviors">
-    {#each Object.entries(statusGroup) as [status, domainGroup]}
+    {#each Object.entries(statusGroup) as [status, domainGroup] (status)}
       <div class="domain-block">
-        <span
-          >{status} - {Object.entries(domainGroup).reduce(
+        <span>
+          {status} - {Object.entries(domainGroup).reduce(
             (prev, current) => prev + current[1].length,
             0
-          )}</span
-        >
+          )}
+        </span>
 
-        {#each Object.entries(domainGroup) as [domain, myBehaviors]}
+        {#each Object.entries(domainGroup) as [domain, myBehaviors] (domain)}
           <div>
             <span>{domain}</span>
             <ul>
-              {#each myBehaviors as behavior, idx}
+              {#each myBehaviors as behavior (behavior.id)}
                 <li>
                   <details open={isExpanded}>
                     <summary>
@@ -113,7 +120,7 @@
                     </summary>
 
                     <div class="projects">
-                      {#each behavior.projects as project}
+                      {#each behavior.projects as project (project.id)}
                         <a
                           class:success={project.expectation === 'above' ||
                             project.expectation === 'meets'}

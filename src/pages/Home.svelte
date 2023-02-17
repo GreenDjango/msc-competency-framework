@@ -2,7 +2,9 @@
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
 
-  import ExpectationLegend, { iconExpectationMap } from '../components/ExpectationLegend.svelte'
+  import ExpectationLegend, {
+    iconExpectationMap,
+  } from '../components/ExpectationLegend.svelte'
   import Icon, { type IconName } from '../components/Icon.svelte'
   import StudentBanner from '../components/StudentBanner.svelte'
   import {
@@ -14,7 +16,7 @@
     sortProjectExpectation,
     trainingPathList,
   } from '../lib/competencies'
-  import { ApplyFilterProjectToDomainGroup } from '../lib/filter'
+  import { applyFilterProjectToDomainGroup } from '../lib/filter'
   import { findId } from '../lib/utils'
   import { pageTransitionDuration } from '../lib/config'
   import { myBehaviorsStore, preferenceStore } from '../store'
@@ -73,10 +75,13 @@
     const newCompetenceGroup: typeof domainGroup = {}
     for (const comp of behaviorsByProject) {
       const domain =
-        comp.domainId + '. ' + findId(competencyFrameworkData?.domains, comp.domainId)?.label
+        comp.domainId +
+        '. ' +
+        findId(competencyFrameworkData?.domains, comp.domainId)?.label
       const skill =
         comp.skillId + ' ' + findId(competencyFrameworkData?.skills, comp.skillId)?.label
-      const weight = comp.projects.find((p) => p.projectId === projectSelected?.id)?.weight ?? -1
+      const weight =
+        comp.projects.find((p) => p.projectId === projectSelected?.id)?.weight ?? -1
 
       const myBehavior = $myBehaviorsStore?.find((b) => comp.id.includes(b.id))
 
@@ -97,7 +102,9 @@
         label: `${comp.id.slice(0, -4)} - ${comp.label}`,
         status: myBehavior?.status || ('none' as 'none'),
         weight,
-        projects: projects.sort((a, b) => sortProjectExpectation(a.expectation, b.expectation)),
+        projects: projects.sort((a, b) =>
+          sortProjectExpectation(a.expectation, b.expectation)
+        ),
       }
 
       if (!newCompetenceGroup[domain]) newCompetenceGroup[domain] = {}
@@ -113,7 +120,7 @@
 
   <div class="filter">
     <label>
-      <span> Spe: </span>
+      <span>Spe: </span>
       <select name="" id="" bind:value={speFilter}>
         {#each [...trainingPathList] as spe}
           <option value={spe}>{spe}</option>
@@ -122,7 +129,7 @@
     </label>
 
     <label>
-      <span> Project: </span>
+      <span>Project: </span>
       <select name="" id="" bind:value={projectFilter}>
         <option value="null">Choose a project</option>
         {#each projectList as project}
@@ -136,7 +143,12 @@
     <div class="project-info">
       Selected project:&nbsp;
       {#if projectSelected.href}
-        <a href={projectSelected.href} target="_blank" rel="noopener noreferrer" class="highlight">
+        <a
+          href={projectSelected.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="highlight"
+        >
           <b>{projectSelected.label}</b>
         </a>
       {:else}
@@ -150,14 +162,14 @@
   {/if}
 
   <div class="project-behaviors">
-    {#each Object.entries(scopeToProject ? ApplyFilterProjectToDomainGroup(domainGroup, projectFilter) : domainGroup) as [domain, skillGroup]}
+    {#each Object.entries(domainGroup) as [domain, skillGroup] (domain)}
       <div class="domain-block">
         <span>{domain}</span>
         <div>
-          {#each Object.entries(skillGroup) as [skill, behaviorList]}
+          {#each Object.entries(skillGroup) as [skill, behaviorList] (skill)}
             <span>{skill}</span>
             <ul>
-              {#each behaviorList as behavior}
+              {#each behaviorList as behavior (behavior.label)}
                 <li
                   class:success={behavior.status === 'success'}
                   class:failed={behavior.status === 'failed'}
@@ -183,7 +195,7 @@
                     </summary>
 
                     <div class="projects">
-                      {#each behavior.projects as project}
+                      {#each behavior.projects as project (project.id + project.expectation)}
                         <div
                           class:success={project.expectation === 'above' ||
                             project.expectation === 'meets'}
