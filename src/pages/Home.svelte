@@ -16,7 +16,7 @@
     sortProjectExpectation,
     trainingPathList,
   } from '../lib/competencies'
-  import { applyFilterProjectToDomainGroup } from '../lib/filter'
+  import { ApplyFilterProjectToDomainGroup } from '../lib/filter'
   import { findId } from '../lib/utils'
   import { pageTransitionDuration } from '../lib/config'
   import { myBehaviorsStore, preferenceStore } from '../store'
@@ -162,7 +162,7 @@
   {/if}
 
   <div class="project-behaviors">
-    {#each Object.entries(domainGroup) as [domain, skillGroup] (domain)}
+    {#each Object.entries(scopeToProject ? ApplyFilterProjectToDomainGroup(domainGroup, projectFilter) : domainGroup) as [domain, skillGroup] (domain)}
       <div class="domain-block">
         <span>{domain}</span>
         <div>

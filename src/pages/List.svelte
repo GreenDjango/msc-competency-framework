@@ -115,7 +115,7 @@
                         <Icon name={iconStatusMap[behavior.status]} />
                       </span>
                       <span class="label">
-                        <span>{behavior.id} - {behavior.title}</span>
+                        {behavior.id} - {behavior.title}
                       </span>
                     </summary>
 
@@ -167,8 +167,16 @@
     gap: 0.5rem;
     padding: 0 2rem;
 
+    @media (min-width: 1350px) {
+      flex-wrap: nowrap;
+
+      .domain-block {
+        min-width: 25rem;
+      }
+    }
+
     .domain-block {
-      width: 35rem;
+      max-width: 35rem;
       border: 1px solid #4e4e4e;
       border-radius: 0.25rem;
       padding: 1rem;
@@ -204,9 +212,7 @@
           }
 
           .label {
-            > span {
-              padding-right: 0.5rem;
-            }
+            padding-right: 0.5rem;
           }
 
           .projects {
