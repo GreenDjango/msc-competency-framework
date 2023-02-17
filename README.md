@@ -8,6 +8,23 @@
 
 **See https://greendjango.github.io/msc-competency-framework**
 
+## Explanation
+
+### Static data
+
+In [gandalf.epitech.eu](https://gandalf.epitech.eu/local/graph/view.php) (tab *Competency Framework*), you can act with a infographic who shows the importance of behaviors within your training path.
+
+This graph is an [iframe](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe) from third party service, [Flourish](https://flourish.studio/visualisations/treemaps/).
+Since is a generic service, we can scrap the JSON data available in a `<script>` tag from this html page.
+
+> See [`helpers/competencyApi.js`](helpers/competencyApi.js) for more details.
+
+We provide a self hosted behaviors infographic (without google analytics Flourish calls) at [/chart](https://greendjango.github.io/msc-competency-framework/#/chart).
+
+### Personal data
+
+> TODO
+
 ## Install
 
 ```shell
@@ -51,6 +68,9 @@ Next you add this config in `.vscode/settings.json`:
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[svelte]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
