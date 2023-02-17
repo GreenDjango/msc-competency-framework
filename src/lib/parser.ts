@@ -1,5 +1,6 @@
 import type {
   BehaviorStatus,
+  ImportInfo,
   MyBehavior,
   MyBehaviorProject,
   ProjectExpectation,
@@ -125,6 +126,25 @@ export function parseStudentInfoFromHtml(htmlData: string) {
         break
     }
   })
+
+  return infos
+}
+
+export function parseImportInfoFromHtml(htmlData: string) {
+  const parser = new globalThis.DOMParser()
+  const htmlDoc = parser.parseFromString(htmlData, 'text/html')
+
+  const rawInfos = htmlDoc.querySelectorAll('.dateModifiedContainer .dateModified')
+
+  if (!rawInfos.length) {
+    throw Error('Import/Date informations css class not found.')
+  }
+
+  const infos: ImportInfo = {
+    lastImportFileModified: 0,
+    lastCompetenciesCalculation: rawInfos[0]?.textContent ?? null,
+    lastThresholdsModified: rawInfos[1]?.textContent ?? null,
+  }
 
   return infos
 }

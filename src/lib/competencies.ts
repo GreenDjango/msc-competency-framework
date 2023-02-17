@@ -84,8 +84,8 @@ export type StudentInfo = {
 
 export type ImportInfo = {
   lastImportFileModified: number
-  lastCompetenciesCalculation: string
-  lastThresholdsModified: string
+  lastCompetenciesCalculation: string | null
+  lastThresholdsModified: string | null
 }
 
 export function sortProjectExpectation(

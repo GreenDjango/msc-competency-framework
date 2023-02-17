@@ -3,7 +3,11 @@
   import { fade } from 'svelte/transition'
 
   import StudentBanner from '../components/StudentBanner.svelte'
-  import { parseMyCompetenciesFromHtml, parseStudentInfoFromHtml } from '../lib/parser'
+  import {
+    parseImportInfoFromHtml,
+    parseMyCompetenciesFromHtml,
+    parseStudentInfoFromHtml,
+  } from '../lib/parser'
   import { signOut } from '../lib/student'
   import { pageTransitionDuration } from '../lib/config'
   import { lastImportInfoStore, myBehaviorsStore, studentInfoStore } from '../store'
@@ -38,9 +42,14 @@
     try {
       const behaviors = parseMyCompetenciesFromHtml(fileData)
       const studentInfos = parseStudentInfoFromHtml(fileData)
+      const importInfos = parseImportInfoFromHtml(fileData)
       signOut()
       myBehaviorsStore.set(behaviors)
       studentInfoStore.set(studentInfos)
+      lastImportInfoStore.set({
+        ...importInfos,
+        lastImportFileModified: file.lastModified ?? 0,
+      })
 
       finishImport = true
       message = `${studentInfos.email} successfully imported.`
