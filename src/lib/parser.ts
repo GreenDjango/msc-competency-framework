@@ -47,11 +47,25 @@ export function parseMyCompetenciesFromHtml(htmlData: string) {
 
         return { id, href, expectation } as MyBehaviorProject
       })
+
+      const projectsWithoutDupli = projects.filter(
+        (p1, idx, arr) => idx === arr.findIndex((p2) => p2.id === p1.id)
+      )
+
+      if (projectsWithoutDupli.length !== projects.length)
+        console.warn(`Behavior ${path} - ${title}: duplicate projects found`, projects)
+
       let status: BehaviorStatus = 'unrated'
-      if (projects.some((p) => p.expectation === 'above' || p.expectation === 'meets')) {
+      if (
+        projectsWithoutDupli.some(
+          (p) => p.expectation === 'above' || p.expectation === 'meets'
+        )
+      ) {
         status = 'success'
       } else if (
-        projects.some((p) => p.expectation === 'below' || p.expectation === 'failed')
+        projectsWithoutDupli.some(
+          (p) => p.expectation === 'below' || p.expectation === 'failed'
+        )
       ) {
         status = 'failed'
       }
@@ -62,7 +76,7 @@ export function parseMyCompetenciesFromHtml(htmlData: string) {
         id: path,
         title,
         status,
-        projects,
+        projects: projectsWithoutDupli,
       }
       if (!competencyTitle || !behavior.id || !behavior.title) {
         console.warn('Fail to import a behavior:', val, behavior)
