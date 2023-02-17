@@ -10,7 +10,7 @@
 
 <div class="app">
   <header>
-    <a href="/" class="title">
+    <a href="./"  class="title">
       <h3>MSC</h3>
       <h2>Competency Framework</h2>
     </a>
