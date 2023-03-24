@@ -23,7 +23,32 @@ We provide a self hosted behaviors infographic (without google analytics Flouris
 
 ### Personal data
 
-> TODO
+You can also import and parse your personal data from [gandalf.epitech.eu](https://gandalf.epitech.eu/local/graph/view.php) (tab *Competency Tree*).
+It will populate the [home page](https://greendjango.github.io/msc-competency-framework/) and the [list page](https://greendjango.github.io/msc-competency-framework/#/list) with your data.
+
+### Taxonomy
+
+MSC competency framework is a referential based on the [European Digital Competence Framework](https://joint-research-centre.ec.europa.eu/digcomp/digcomp-framework_en),
+tweaked with custom addons.
+
+It is divided into 4 hierarchical levels:
+- An **expectation** is a precise and observable proof of competence detention.<br/>
+It is restricted to a given context (typically a project), evaluated as absent, below, meets or above.<br/>
+*Example : 0. EXPRESSION -> 0.3 Written Production -> 0.3.B01 - Support a talk with relevant slides -> T-WEB-700_msc2021*
+
+- A **behavior** is a specific aptitude, demonstrated by an expectation.<br/>
+Each behavior includes one or several expectations.<br/>
+Each time an expectation is evaluated 'meets' or 'above', a corresponding behavior becomes proficient.<br/>
+*Example : 0. EXPRESSION -> 0.3 Written Production -> 0.3.B01 - Support a talk with relevant slides*
+
+- A **skill** is a generic aptitude as one could find on resumes for instance.<br/>
+It is build up from a set of behaviors that require this skill. They are inherited from digComp.<br/>
+Skills are rated regarding the number of proficient behaviors it contains.<br/>
+*Example : 0. EXPRESSION -> 0.3 Written Production*
+
+- A **domain** is a category that gathers several related skills in logical units.<br/>
+They are inherited from digComp. Domains are not directly rated.<br/>
+*Example : 0. EXPRESSION*
 
 ## Install
 

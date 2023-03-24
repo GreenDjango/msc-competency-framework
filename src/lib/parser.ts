@@ -48,6 +48,8 @@ export function parseMyCompetenciesFromHtml(htmlData: string) {
         return { id, href, expectation } as MyBehaviorProject
       })
 
+      // Some behavior have twice the same project
+      // We take the first occurence and warn in the console
       const projectsWithoutDupli = projects.filter(
         (p1, idx, arr) => idx === arr.findIndex((p2) => p2.id === p1.id)
       )
