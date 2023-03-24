@@ -1,7 +1,15 @@
 import { decode, encode } from 'js-base64'
 
-export function findId<T extends { id: B }, B>(array: T[] | undefined, id: B) {
+export function findId<T extends { readonly id: unknown }, ID extends T['id']>(
+  array: readonly T[] | undefined,
+  id: ID
+) {
   return array?.find((val) => val.id === id)
+}
+
+/** Only for JSON data safe */
+export function deepClone<T>(data: T) {
+  return JSON.parse(JSON.stringify(data)) as T
 }
 
 export function cleanDOMString(str: string) {

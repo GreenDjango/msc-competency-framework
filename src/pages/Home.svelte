@@ -15,8 +15,13 @@
     type TrainingPath,
     sortProjectExpectation,
     trainingPathList,
+    type BehaviorNode,
   } from '../lib/competencies'
-  import { ApplyFilterProjectToDomainGroup } from '../lib/filter'
+  import {
+    ApplyFilterProjectToDomainGroup,
+    behaviorsByProject,
+    behaviorsBySpe,
+  } from '../lib/filter'
   import { findId } from '../lib/utils'
   import { pageTransitionDuration } from '../lib/config'
   import { myBehaviorsStore, preferenceStore } from '../store'
@@ -33,6 +38,7 @@
   let projectFilter: string = $preferenceStore?.projectId || 'null'
   let scopeToProject: boolean = false
 
+  let behaviors: BehaviorNode[] = []
   let projectList: { label: string; value: string }[] = []
   let domainGroup: {
     [domain: string]: {
@@ -55,6 +61,7 @@
   $: {
     preferenceStore.update((old) => ({ ...old, projectId: projectFilter }))
   }
+
   $: projectSelected = findId(competencyFrameworkData?.projects, projectFilter) || null
   $: {
     const projectsId =
@@ -65,15 +72,19 @@
         .map((p) => ({ label: p.label.replace('T-', ''), value: p.id }))
         .sort((a, b) => a.label.localeCompare(b.label)) || []
   }
-  $: behaviorsByProject =
-    competencyFrameworkData?.behaviors.filter(
-      (b) =>
-        b.trainingPathId === speFilter &&
-        b.projects.some((p) => p.projectId === projectSelected?.id)
-    ) || []
+  $: {
+    if (competencyFrameworkData) {
+      let filterBehaviors = competencyFrameworkData.behaviors
+      filterBehaviors = behaviorsBySpe(filterBehaviors, speFilter)
+      if (projectSelected?.id) {
+        filterBehaviors = behaviorsByProject(filterBehaviors, projectSelected?.id)
+      }
+      behaviors = filterBehaviors
+    }
+  }
   $: {
     const newCompetenceGroup: typeof domainGroup = {}
-    for (const comp of behaviorsByProject) {
+    for (const comp of behaviors) {
       const domain =
         comp.domainId +
         '. ' +
@@ -119,45 +130,48 @@
   <StudentBanner />
 
   <div class="filter">
-    <label>
-      <span>Spe: </span>
-      <select name="" id="" bind:value={speFilter}>
+    <span>
+      <label for="spe-filter">Spe: </label>
+      <select id="spe-filter" bind:value={speFilter}>
         {#each [...trainingPathList] as spe}
           <option value={spe}>{spe}</option>
         {/each}
       </select>
-    </label>
+    </span>
 
-    <label>
-      <span>Project: </span>
-      <select name="" id="" bind:value={projectFilter}>
+    <span>
+      <label for="project-filter">Project: </label>
+      <select id="project-filter" bind:value={projectFilter}>
         <option value="null">Choose a project</option>
         {#each projectList as project}
           <option value={project.value}>{project.label}</option>
         {/each}
       </select>
-    </label>
+    </span>
+
+    <span>
+      <label for="scope-to-project">Scope to project:</label>
+      <input id="scope-to-project" type="checkbox" bind:checked={scopeToProject} />
+    </span>
   </div>
 
   {#if projectSelected}
     <div class="project-info">
-      Selected project:&nbsp;
-      {#if projectSelected.href}
-        <a
-          href={projectSelected.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="highlight"
-        >
+      <span>
+        Selected project:&nbsp;
+        {#if projectSelected.href}
+          <a
+            href={projectSelected.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="highlight"
+          >
+            <b>{projectSelected.label}</b>
+          </a>
+        {:else}
           <b>{projectSelected.label}</b>
-        </a>
-      {:else}
-        <b>{projectSelected.label}</b>
-      {/if}
-    </div>
-    <div class="project-scope">
-      <span>Scope to project:&nbsp;</span>
-      <input type="checkbox" bind:checked={scopeToProject} />
+        {/if}
+      </span>
     </div>
   {/if}
 
@@ -229,6 +243,7 @@
   .filter {
     display: flex;
     justify-content: center;
+    align-items: baseline;
     gap: 1rem;
     width: 100%;
     padding: 0.5rem 1rem 0 1rem;
@@ -236,16 +251,9 @@
 
   .project-info {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: baseline;
     padding: 1rem 1rem 0.5rem 1rem;
-  }
-
-  .project-scope {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5rem;
   }
 
   .project-behaviors {
