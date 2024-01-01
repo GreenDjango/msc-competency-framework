@@ -12,7 +12,7 @@
 
 ### Static data
 
-In [gandalf.epitech.eu](https://gandalf.epitech.eu/local/graph/view.php) (tab *Competency Framework*), you can act with a infographic who shows the importance of behaviors within your training path.
+In [gandalf.epitech.eu](https://gandalf.epitech.eu/local/graph/view.php) (tab _Competency Framework_), you can act with a infographic who shows the importance of behaviors within your training path.
 
 This graph is an [iframe](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe) from third party service, [Flourish](https://flourish.studio/visualisations/treemaps/).
 Since is a generic service, we can scrap the JSON data available in a `<script>` tag from this html page.
@@ -23,7 +23,7 @@ We provide a self hosted behaviors infographic (without google analytics Flouris
 
 ### Personal data
 
-You can also import and parse your personal data from [gandalf.epitech.eu](https://gandalf.epitech.eu/local/graph/view.php) (tab *Competency Tree*).
+You can also import and parse your personal data from [gandalf.epitech.eu](https://gandalf.epitech.eu/local/graph/view.php) (tab _Competency Tree_).
 It will populate the [home page](https://greendjango.github.io/msc-competency-framework/) and the [list page](https://greendjango.github.io/msc-competency-framework/#/list) with your data.
 
 ### Taxonomy
@@ -32,23 +32,24 @@ MSC competency framework is a referential based on the [European Digital Compete
 tweaked with custom addons.
 
 It is divided into 4 hierarchical levels:
+
 - An **expectation** is a precise and observable proof of competence detention.<br/>
-It is restricted to a given context (typically a project), evaluated as absent, below, meets or above.<br/>
-*Example : 0. EXPRESSION -> 0.3 Written Production -> 0.3.B01 - Support a talk with relevant slides -> T-WEB-700_msc2021*
+  It is restricted to a given context (typically a project), evaluated as absent, below, meets or above.<br/>
+  _Example : 0. EXPRESSION -> 0.3 Written Production -> 0.3.B01 - Support a talk with relevant slides -> T-WEB-700_msc2021_
 
 - A **behavior** is a specific aptitude, demonstrated by an expectation.<br/>
-Each behavior includes one or several expectations.<br/>
-Each time an expectation is evaluated 'meets' or 'above', a corresponding behavior becomes proficient.<br/>
-*Example : 0. EXPRESSION -> 0.3 Written Production -> 0.3.B01 - Support a talk with relevant slides*
+  Each behavior includes one or several expectations.<br/>
+  Each time an expectation is evaluated 'meets' or 'above', a corresponding behavior becomes proficient.<br/>
+  _Example : 0. EXPRESSION -> 0.3 Written Production -> 0.3.B01 - Support a talk with relevant slides_
 
 - A **skill** is a generic aptitude as one could find on resumes for instance.<br/>
-It is build up from a set of behaviors that require this skill. They are inherited from digComp.<br/>
-Skills are rated regarding the number of proficient behaviors it contains.<br/>
-*Example : 0. EXPRESSION -> 0.3 Written Production*
+  It is build up from a set of behaviors that require this skill. They are inherited from digComp.<br/>
+  Skills are rated regarding the number of proficient behaviors it contains.<br/>
+  _Example : 0. EXPRESSION -> 0.3 Written Production_
 
 - A **domain** is a category that gathers several related skills in logical units.<br/>
-They are inherited from digComp. Domains are not directly rated.<br/>
-*Example : 0. EXPRESSION*
+  They are inherited from digComp. Domains are not directly rated.<br/>
+  _Example : 0. EXPRESSION_
 
 ## Install
 
